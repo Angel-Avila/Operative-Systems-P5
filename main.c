@@ -69,7 +69,7 @@ void initsem(sem_t * sem, int value) // Inicializa un semáforo
   initqueue(&sem->queue);
 }
 
-void waitsem(sem_t * sem, int i) // Función de espera de semáforo
+void waitsem(sem_t * sem) // Función de espera de semáforo
 {
   int l = 1;
   do { atomic_xchg(l,*g); } while(l!=0); // Puede pasar si otro proceso no esta en esta función
@@ -86,7 +86,7 @@ void waitsem(sem_t * sem, int i) // Función de espera de semáforo
   *g=0; // Otro proceso puede entrar a la sección atómica
 }
 
-void signalsem(sem_t * sem, int i)
+void signalsem(sem_t * sem)
 {
   int l = 1;
   do { atomic_xchg(l,*h); } while(l!=0); // Puede pasar si otro proceso no esta en esta función
@@ -109,12 +109,12 @@ void proceso(int i)
   int k;
   for(k = 0; k<CICLOS ; k++)
   {
-    waitsem(sem, i);
+    waitsem(sem);
     printf("+ Entra %s ",pais[i]);
     fflush(stdout);
     sleep(rand()%3);
     printf("- %s Sale\n",pais[i]);
-    signalsem(sem, i);
+    signalsem(sem);
     sleep(rand()%3);   // Espera aleatoria fuera de la sección crítica
   }
   exit(0); // Termina el proceso
